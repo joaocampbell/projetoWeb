@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>MovieStar - Blade Runner 2049</title>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <h3>MovieStar</h3>
+    </div>
+    <div class="nav" id="small_menu">
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../movies.html">Movies</a></li>
+            <li><a href="../genre.html">Genres</a></li>
+        </ul>
+    </div> 
+</header>
+
+<!---movie---->
+<section>
+    <div class="heropage">
+        <div class="inside-heropage">
+            <span>NOW STREAMING</span>
+            <div class="line1"></div>
+            <h1 id="movieTitle">Blade Runner 2049</h1>
+            <p id="movieInfo">Action | Drama | Mystery | 2017 | USA | 164 min</p>
+            <div class="btn1">
+                <button onclick="togglePlatforms()" class="toggle-button"><i class="fas fa-play"></i> Show Platforms</button>
+                <button id="watchTrailerButton"><i class="fas fa-play"></i> Watch Trailer</button>
+            </div>
+            <div class="star-rating" id="starRating">
+                <span class="star" data-value="5">&#9733;</span>
+                <span class="star" data-value="4">&#9733;</span>
+                <span class="star" data-value="3">&#9733;</span>
+                <span class="star" data-value="2">&#9733;</span>
+                <span class="star" data-value="1">&#9733;</span>
+            </div>
+            <br>
+            <button id="submitRating" disabled>Enviar Avaliação</button>
+        </div>
+    </div>
+
+    <div class="poster">
+        <img id="moviePoster" src="../img/poste/5.jpg" alt="Blade Runner 2049 Poster">
+    </div>
+</section>
+
+<!---description movie---->
+<div class="description-movies">
+    <h3 id="movieTitleDescription">Blade Runner 2049</h3>
+    <div class="description-container">
+        <p id="movieDescription">A young blade runner's discovery of a long-buried secret leads him to track down former blade runner Rick Deckard, who's been missing for thirty years.</p>
+    </div>
+</div>
+
+<!-- Comentário -->
+<section>
+    <div class="comment-section">
+        <h3>Deixe seu Comentário</h3>
+        <form id="commentForm">
+            <label for="username">Nome:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="comment">Comentário:</label>
+            <textarea id="comment" name="comment" required></textarea>
+            <button type="submit">Enviar Comentário</button>
+        </form>
+    </div>
+</section>
+
+<!-- Div to show platform information -->
+<div id="platformWindow">
+    <h2>Available Platforms</h2>
+    <p id="platformInfo"></p>
+</div>
+
+<!--Goto button-->
+<div class="scroll">
+    <a href=""><i class="fas fa-arrow-up"></i></a>
+</div>
+
+<!-- JavaScript -->
+<script src="../js/systemStar.js"></script>
+<script src="../js/movie.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const starRating = document.getElementById('starRating');
+        const stars = starRating.querySelectorAll('.star');
+        const submitButton = document.getElementById('submitRating');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = star.getAttribute('data-value');
+                highlightStars(selectedRating);
+                checkSubmitButton();
+            });
+        });
+
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
+
+        function checkSubmitButton() {
+            if (selectedRating > 0) {
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+
+        submitButton.addEventListener('click', () => {
+            const filme = document.getElementById('movieTitle').textContent.trim();
+            const estrelas = Number(selectedRating);
+            const avaliacao = { filme, estrelas };
+
+            fetch('/avaliar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(avaliacao)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Exibir mensagem de retorno
+                resetRating(); // Limpar a seleção de estrelas
+            })
+            .catch(error => {
+                console.error('Erro ao enviar avaliação:', error);
+            });
+        });
+
+        function resetRating() {
+            selectedRating = 0;
+            highlightStars(selectedRating);
+            submitButton.disabled = true; // Desabilitar o botão após enviar a avaliação
+        }
+
+        // Enviar comentário
+        const commentForm = document.getElementById('commentForm');
+        commentForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const filme = document.getElementById('movieTitle').textContent.trim();
+            const username = document.getElementById('username').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+            const comentario = { filme, username, comment };
+
+            fetch('/comentar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(comentario)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Exibir mensagem de retorno
+                commentForm.reset(); // Limpar formulário de comentário
+            })
+            .catch(error => {
+                console.error('Erro ao enviar comentário:', error);
+            });
+        });
+    });
+
+    // Funcionalidade para assistir ao trailer
+    const watchTrailerButton = document.getElementById('watchTrailerButton');
+    watchTrailerButton.addEventListener('click', function() {
+        window.open('https://www.youtube.com/watch?v=AwwbhhjQ9Xk&t=1s', '_blank');
+    });
+</script>
+
+</body>
+</html>

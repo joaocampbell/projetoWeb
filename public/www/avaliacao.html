@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>MovieStar - Avaliações</title>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <h3>MovieStar</h3>
+    </div>
+    <div class="nav" id="small_menu">
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../movies.html">Movies</a></li>
+            <li><a href="../genre.html">Genres</a></li>
+        </ul>
+    </div> 
+</header>
+
+<section id="avaliacoes">
+    <!-- Aqui serão adicionados dinamicamente os elementos dos filmes -->
+</section>
+
+<!-- JavaScript -->
+<script>
+    // Função para carregar e exibir as avaliações do JSON
+    function carregarAvaliacoes() {
+        const url = '/avaliacoes'; // Rota configurada no Express para obter avaliacoes.json
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar o arquivo JSON');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const avaliacoesDiv = document.getElementById('avaliacoes');
+                Object.keys(data).forEach(filme => {
+                    const filmeDiv = document.createElement('div');
+                    filmeDiv.classList.add('filme');
+
+                    const titulo = document.createElement('div');
+                    titulo.classList.add('titulo');
+                    titulo.textContent = filme;
+                    filmeDiv.appendChild(titulo);
+
+                    const estrelas = document.createElement('div');
+                    estrelas.classList.add('estrelas');
+                    if (data[filme].avaliacoes && data[filme].avaliacoes.length > 0) {
+                        estrelas.textContent = `Estrelas: `;
+                        data[filme].avaliacoes.forEach(avaliacao => {
+                            const estrela = document.createElement('span');
+                            estrela.classList.add('estrela');
+                            estrela.textContent = '★';
+                            estrelas.appendChild(estrela);
+                        });
+                    } else {
+                        estrelas.textContent = 'Sem avaliações';
+                    }
+                    filmeDiv.appendChild(estrelas);
+
+                    const comentarios = document.createElement('div');
+                    comentarios.classList.add('comentarios');
+                    if (data[filme].comentarios && data[filme].comentarios.length > 0) {
+                        comentarios.textContent = `Comentários: `;
+                        data[filme].comentarios.forEach(comentario => {
+                            const p = document.createElement('p');
+                            p.textContent = `${comentario.username}: ${comentario.comment}`;
+                            comentarios.appendChild(p);
+                        });
+                    } else {
+                        comentarios.textContent = 'Sem comentários';
+                    }
+                    filmeDiv.appendChild(comentarios);
+
+                    avaliacoesDiv.appendChild(filmeDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar o arquivo JSON', error);
+            });
+    }
+
+    // Chamada da função para carregar as avaliações quando a página carregar
+    document.addEventListener('DOMContentLoaded', carregarAvaliacoes);
+</script>
+
+</body>
+</html>

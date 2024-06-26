@@ -1,0 +1,25 @@
+{
+  "filmes": {
+    "Interstellar": {
+      "avaliacoes": [
+        5,
+        5,
+        2
+      ],
+      "comentarios": [
+        {
+          "username": "test4",
+          "comment": "test4"
+        },
+        {
+          "username": "`joao",
+          "comment": "testtest"
+        },
+        {
+          "username": "testapreseta",
+          "comment": "teste"
+        }
+      ]
+    }
+  }
+}
